@@ -1,0 +1,40 @@
+Project Name: Biodiversity Log
+Project Status: Active
+Description: A Linux based software tool that records biodiversity information.
+Video link: https://youtu.be/HHeN1UipZDA
+
+References:
+I used the following websites and tutorials while working on this project:
+
+Validation of user input
+1.	https://medium.com/@fahimhossain_16989/bash-scripts-with-user-prompt-and-input-validation-d6db5546f85b
+2.	https://www.unix.com/shell-programming-and-scripting/4212-what-can-i-do-check-input-all-alphabet.html
+3.	https://www.regular-expressions.info/email.html
+4.	https://stackoverflow.com/questions/21112707/check-if-a-string-matches-a-regex-in-bash-script/21112809
+5.	https://www.golinuxcloud.com/check-if-string-contains-numbers-shell-script/#3_Check_if_string_contains_only_alphabets_and_numbers
+
+Grep - If not results are returned
+6.	https://unix.stackexchange.com/questions/223503/how-to-use-grep-when-file-does-not-contain-the-string/223504
+
+Until Loop
+7.	https://linuxize.com/post/bash-until-loop/
+
+Colours and Formatting
+8.	https://www.oreilly.com/library/view/linux-shell-scripting/9781785881985/b0ddd805-aa79-441d-b5a7-380c66c7712d.xhtml 
+9.	https://misc.flogisoft.com/bash/tip_colors_and_formatting
+
+Dealing with Duplicate Records
+10.	https://www.makeuseof.com/how-to-find-duplicate-data-in-a-linux-text-file-with-uniq/
+11.	https://shapeshed.com/unix-sort/#how-to-sort-and-remove-duplicates 
+12.	https://stackoverflow.com/questions/1444406/how-to-delete-duplicate-lines-in-a-file-without-sorting-it-in-unix
+13.	https://unix.stackexchange.com/questions/30173/how-to-remove-duplicate-lines-inside-a-text-file
+
+Using Sed
+14.	https://www.cyberciti.biz/faq/using-sed-to-delete-empty-lines/
+15.	https://myshell.co.uk/blog/2012/07/sed-unix-stream-editor-cheat-sheet/
+
+Sending Emails
+16.	https://tecadmin.net/ways-to-send-email-from-linux-command-line/
+
+Select Statement Menus
+17	https://unix.stackexchange.com/questions/293340/bash-how-can-i-re-display-selection-menu-after-a-selection-is-chosen-and-perfo

@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Author: Fiona Waters - Student Number 20095357
+
+# Menu option 3 - Search for Species. This script allows the user to search for an existing record in the speciesDetails file.
+# The user is prompted to enter a search term. This input is checked to ensure it is not blank. Grep is then used to search the file.
+# If a record matches the search term then the results will be displayed, this includes displaying the amount of records found and the
+# records themselves with line numbers included. If there are no results a message is displayed to inform the user of this. After the
+# search is complete the user is given the option to search for another record. If they choose not to they are returned to the main menu.
+
+echo -e "\e[1;44m \e[1;37m What species would you like to search for? \e[0m"
+	read 'searchTerm'
+# while loop used so that user cannot enter a blank search term.
+	while [ "$searchTerm" = "" ]
+		do      echo -e "\e[1;44m Invalid input, please enter text. \e[0m"
+			read 'searchTerm'
+		done
+echo
+#if search term is found, awk is used to print how many times it was found. Grep is then used again to show the list of records it was found in.
+        if
+        	grep -i -q "${searchTerm}" speciesDetails
+	then
+		echo
+		grep -c -i "${searchTerm}" speciesDetails | awk '{print "Your search term was found in " $1 " record(s)!"}'
+		echo
+		echo -e "\e[1;44m The following lines match your search: \e[0m"
+		echo
+		grep -i -n "${searchTerm}" speciesDetails
+		echo
+#else if nothing matches the search term the user is informed and directed to start again or return to the main menu.
+	else
+     		echo -e "\e[1;44m Sorry, no records found! Press s to start again or x to return to the main menu : \e[0m"
+                	read answer
+                        	case $answer in
+                                	s)
+                                	./searchSpecies
+                                	;;
+                                	x)
+                                	exit
+                                	;;
+                                	*) echo -e "\e[1;44m Invalid input! \e[0m"
+                                	./searchSpecies
+                                	;;
+                        	esac
+	fi
+# after a successful search the user is given the option to search again.
+echo -e "\e[1;44m Would you like to search for another record? [y or n]: \e[0m"
+	read reply
+	case $reply in
+        	y)
+        	./searchSpecies
+        	;;
+        	n)
+		exit
+        	;;
+        	*)
+        	echo -e "\e[1;44m Invalid input, please enter y or n! \e[0m"
+        	;;
+	esac

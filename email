@@ -1,0 +1,107 @@
+#!/bin/bash
+#
+# Author: Fiona Waters - Student Number - 20095357
+#
+#This script allows a user to email any or all contacts contained on the speciesDetails file. The user is presented with a menu.
+# The user can decide to Choose Recorder(s) to email, Email all Recorders or Return to Main Menu. If the user chooses option 1
+# they are then asked if they would like to view the speciesDetails file first. Next they are asked for their search term which is
+# then checked using grep, then awk to print the amount of records found. If there is a record found then the user is asked if they
+# would like to send an email. If the search does not return any records, the user is informed and asked to try again. The user can
+# also choose to email all recorder(s). The email is sent to the last field on each line of the speciesDetail file using the mail command.
+# The correct field is found using sed to avoid reading the header and awk to get the correct field.
+
+# Using a while loop so that menu re-displays when inner menu is exited. Breaks are used to exit each menu item.
+while true; do
+clear
+echo -e "\e[1;44m \e[1;37m Please choose one of the following : \e[0m \e[1;34m"
+#PS3 taking in input from the user.
+PS3='Please enter a number: '
+options=("Choose Recorder(s) to Email" "Email all Recorder(s)" "Return to Main Menu")
+#select allowing the user to choose from the menu.
+select opt in "${options[@]}"
+do
+	case $opt in
+		"Choose Recorder(s) to Email")
+		# giving the user the option to view the file first.
+		echo -e "\e[1;44m \e[1;37m Would you like to view the speciesDetails file first? [y or n]: \e[0m "
+			read answer
+			case $answer in
+        			y)
+        			cat speciesDetails
+        			;;
+        			n)
+        			echo -e "\e[1;44m No problem \e[0m"
+        			;;
+        			*) echo -e "\e[1;44m invalid input, please try again \e[0m"
+        			break
+        			;;
+			esac
+
+		echo -e "\e[1;34m Please enter the name of the species or relevant person you wish to email \e[0m"
+			read name
+			# using grep to search and piping to awk to print how many records the search term was found in.
+			grep -c -i "${name}" speciesDetails | awk '{print "Your search term was found in " $1 " record(s)!"}'
+			echo
+			# if search term is found the user is then given the option to send an email using the results.
+
+			if 	grep -i -n "${name}" speciesDetails;
+				then
+					echo
+					echo -e "\e[1;44m Would you like to email these contacts? [y or n] Choose x to return to the main menu :\e[0m"
+					read response
+					case $response in
+						y)
+						echo -e "\e[1;44m \e[1;37m You have chosen to send an email. Please enter the details below and press CTRL +D on a new line to send \e[0m"
+						# the mail command is used to send mail to the records containing the search term. grep is used to search and awk to separate the last field which contains the email address.
+						# using backquotes to evaluate these commands before executing mail command.
+						mail `grep -i "${name}" speciesDetails | awk '{print $NF}'`
+						echo -e "\e[1;44m Email Sent! \e[0m"
+
+						echo -e "\e[1;44m Would you like to send another email? [y or n]: \e[0m"
+						read reply
+						case $reply in
+        						y)
+        						break
+        						;;
+        						n)
+        						exit
+        						;;
+        						*)
+        						echo -e "\e[1;44m Invalid input, please enter y or n! \e[0m"
+        						;;
+						esac
+						;;
+						n)
+						echo -e "\e[1;44m No problem \e[0m"
+						break
+						;;
+						x)
+						exit
+						;;
+						*) echo -e  "\e[1;44m Invalid input, please choose y,n or x \e[0m"
+						;;
+					esac
+			# if no records are found the user is informed and returned to the email menu.
+				else	echo -e "\e[1;44m Sorry, no records found! Please try again. \e[0m"
+				sleep 5
+				break;
+			fi
+			;;
+
+		"Email all Recorder(s)")
+		# user is instructed on how to proceed with sending an email to all recorders.
+		echo -e "\e[1;44m \e[1;37m You have chosen to send an email to all recorder(s)! Please enter the details below and press CTRL +D on a new line to send \e[0m"
+		# the mail command is used to send an email. The sed command is used to ignore the header and rest of file is piped to awk to separate the last field which contains the email address.
+		# using backquotes to evaluate these commands before executing the mail command.
+		mail `sed -n '3,$p' speciesDetails | awk '{print $NF}'`
+		echo -e "\e[1;44m Email Sent. Returning to Main Menu \e[0m"
+		sleep 5
+		break
+		;;
+
+		"Return to Main Menu")
+		exit
+		;;
+	esac
+done
+done

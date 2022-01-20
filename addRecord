@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# Author: Fiona Waters - Student Number 20095357
+
+# Menu option 1 - Add a new recording of a species. This script allows the user to add a record to the speciesDetails file.
+# The user is first asked if they would like to view the current contents of the file. Next they are prompted to enter the details of the record they wish to add, one at a time.
+# Each variable is read in and validated as correct input. If the format is not correct the user will be informed and prompted to input the correct details. Once all 4 pieces of
+# information have been input they are put together and shown to the user. If the user is happy they can save this record to the file, otherwise they can start again or return to
+# the main menu. The script output is coloured using ANSI/VT100 escape sequences.
+
+# Allowing user to view file before continuing. Using case statement for various options.
+echo -e "\e[1;44m \e[1;37m Would you like to view the speciesDetails file before adding a record? [y or n]: \e[0m "
+read answer
+case $answer in
+	y)
+	cat speciesDetails
+	;;
+	n)
+	echo -e "\e[1;44m No problem \e[0m"
+	;;
+	*) echo -e "\e[1;44m invalid input, please enter y or n \e[0m"
+	./addRecord
+	;;
+esac
+echo
+echo -e "\e[1;44m Please enter the Name of the Species you wish to add: \e[0m"
+	read speciesName
+#using a while loop to disallow blank entries or entries containing numbers.
+	while [ "$speciesName" = "" ] || [ "${speciesName//[!0-9]}" ]
+	do	echo -e "\e[1;44m Species name incorrect. Please enter a valid species name. \e[0m"
+		read speciesName
+	done
+echo
+echo -e "\e[1;44m Please enter the 7 character Eircode of the location where the species was found: \e[0m "
+	read speciesEircode
+#using an until loop to only allow correct format for eircode.
+	until [[ $speciesEircode =~ ^[a-zA-Z0-9]{3}[" "]{0,1}[a-zA-Z0-9]{4}$ ]]
+	do	echo -e "\e[1;44m Eircode incorrect. Please enter a valid eircode \e[0m"
+		read speciesEircode
+	done
+echo
+echo -e "\e[1;44m Please enter the date of this sighting in the following format dd-mm-yyyy : \e[0m "
+	read dateRecorded
+#using an until loop to allow correct format for date.
+	until [[ $dateRecorded =~ ^[0-3][0-9]-[0-1][0-9]-[1-2][0-9][0-9][0-9]$ ]]
+	do	echo -e "\e[1;44m Date incorrect. Please enter a valid date in dd-mm-yyyy format \e[0m"
+		read dateRecorded
+	done
+echo
+echo -e "\e[1;44m Please enter an email address: \e[0m"
+	read emailAddress
+#using an until loop to allow correct format for email address.
+	until [[ $emailAddress =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]
+	do	echo -e "\e[1;44m please enter a valid email address in the following format: yourname@emailprovider.com \e[0m"
+		read emailAddress
+	done
+
+# Taking all user input and creating a variable.
+newRecord="$speciesName $speciesEircode $dateRecorded $emailAddress"
+echo
+
+# showing the input back to the user.
+echo -e "\e[1;29m$newRecord  \e[0m"
+echo
+
+# allowing the user to save input or cancel. 
+echo -e "\e[1;44m Are you happy that these details are correct? press y to save, n to start again or x to return to the main menu: \e[0m"
+	read reply
+	case $reply in
+		y)
+	#if user chooses yes the record is appended to the speciesDetails file, the full file is then shown and a user is asked if they would like to add another record.
+		echo "$newRecord" >> speciesDetails
+		echo -e "\e[1;44m ** Record Added ** \e[0m "
+		cat speciesDetails
+		echo
+		echo -e "\e[1;44m Would you like to add another record? press y to add another record, or any other key to return to the main menu: \e[0m"
+		read response
+		case $response in
+			y)
+			break
+			;;
+			*)
+			exit
+			;;
+		esac
+		;;
+		n)
+		echo -e "\e[1;44m no problem \e[0m"
+		./addRecord
+		;;
+		x)
+		exit;
+		;;
+		*) echo -e "\e[1;44m invalid input, please choose y, n or x \e[0m"
+		;;
+	esac

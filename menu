@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Author - Fiona Waters - Student Number 20095357
+
+# Menu. This script provides the initial interface between the user and the system, presenting the user with a command line menu.
+# The menu includes 5 options, to Add a New Recording of a Species, to Remove an Existing Species Record, to Search for Species,
+# to E-mail Recorder(s) and to Quit and exit the program. In case of incorrect iput the user will be informed and asked to choose
+# again. The script output is coloured using ANSI/VT100 escape sequences. This menu is run using the PS3 command prompt, a select
+# statement and a case statement.
+
+clear
+echo
+echo -e "\e[1;37m ** Welcome to Biodiversiity Log. Here you can record information regarding particular species that have been observed. \n You can also remove records, search for records and send email/s to recorder/s ** \e[0m"
+echo
+# Using a while loop so that menu re-displays when inner menu is exited. Breaks are used to exit each menu item.
+while true
+do
+#PS3 taking in input from the user.
+PS3='Please enter a number: '
+echo -e "\e[1;44m \e[1;37m Please choose one of the following: \e[0m \e[1;34m "
+options=("Add a New Recording of a Species" "Remove an Existing Species Record" "Search for Species" "E-mail Recorder(s)" "Quit")
+#select allowing the user to choose from the menu. Once choice is made the relevant script runs.
+select opt in "${options[@]}"
+do
+	case $opt in
+		"Add a New Recording of a Species")
+			clear
+			./addRecord
+			break;
+			;;
+		"Remove an Existing Species Record")
+			clear
+			./remove
+			break;
+			;;
+		"Search for Species")
+			clear
+			./searchSpecies
+			break;
+			;;
+		"E-mail Recorder(s)")
+			clear
+			./email
+			break;
+			;;
+		"Quit")
+			exit;
+			break ;
+			;;
+		*) echo -e "\e[1;44m \e[1;37m Invalid option $REPLY \e[0m"
+			;;
+	esac
+done
+clear
+done

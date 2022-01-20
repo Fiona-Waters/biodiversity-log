@@ -1,0 +1,197 @@
+#!/bin/bash
+
+# Author: Fiona Waters - Student Number 20095357
+
+# Menu option 2 - Remove a record. This script allows the user to remove a record from the speciesDetails file.
+# The user is presented with a menu with 5 options, to Search for and Remove Records, to Remove Duplicate Records, to Remove Blank Records,
+# to Remove All Records or to Return to Main Menu. This is accomplished using the PS3 command prompt, a select statement and a case statement.
+# The user is also given the option to view the file before searching/removing. Grep and awk are used to search and print search results,
+# sed is used for deletion. The user can choose to delete all search results or some results using line numbers. Validation measures are used
+# to allow for correct user input.
+
+# Using a while loop so that menu re-displays when inner menu is exited. Breaks are used to exit each menu item.
+while true; do
+echo -e "\e[1;44m \e[1;37m Please choose one of the following : \e[0m \e[1;34m"
+# PS3 taking in input from the user.
+PS3='Please enter a number: '
+options=("Search for and Remove Records" "Remove Duplicate Records" "Remove Blank Records" "Remove All Records" "Return to Main Menu")
+#select allowing the user to choose from the menu.
+select opt in "${options[@]}"
+do
+	case $opt in
+		"Search for and Remove Records")
+		# Allowing user to view file before continuing. Using case statement for various options.
+		echo -e "\e[0m \e[1;44m Would you like to view the speciesDetails file before removing a record? [y or n]:\e[0m"
+		read answer
+		case $answer in
+        		y)
+        		cat speciesDetails
+        		echo
+       			;;
+       			n)
+        		echo -e "\e[1;44m no problem \e[0m"
+        		;;
+        		*) echo -e "\e[1;44m Invalid input, please try again! \e[0m"
+			break
+			;;
+		esac
+	echo
+	echo -e "\e[1;44m Please enter the name of the species you wish to remove : \e[0m"
+	#taking in a search term from the user - using a while loop to avoid blank entry.
+	read name
+	while [ "$name" = "" ]
+	do      echo -e "\e[1;44m Invalid - input cannot be blank. Please enter the name of the species you wish to remove :\e[0m"
+        	read name
+	done
+	#using grep command to search using user input, piping to awk to print how many times this input is found.
+	grep -c -i "${name}" speciesDetails | awk '{print "This species was found in " $1 " record(s)!"}' 
+	echo
+	# if statement checking if results are found
+	if
+		grep -i -n "${name}" speciesDetails; then
+		echo
+		# giving the user option to remove the result/s from the file
+		echo -e "\e[1;44m Would you like to delete all [a] or one [o] of these results? Please select a or o. Select x to cancel and return to the main menu \e[0m"
+                read response
+		# case statement allowing for response options
+                case $response in
+                        a)
+                        echo -e "\e[1;44m Are you sure? [y or n] Press x to return to the main menu: \e[0m"
+                        read reply
+                                case $reply in
+                                        y)
+					# using sed to delete the records that include what the term the user has input. Then confirming removal of records and showing full file.
+                                        sed -i "/$name/d" speciesDetails
+                                        echo -e "\e[1;44m Record/s removed \e[0m"
+                                        cat speciesDetails
+                                        break
+                                        ;;
+                                        n)
+                                        echo -e "\e[1;44m No problem \e[0m"
+                                        break
+                                        ;;
+                                        x)
+                                        exit
+                                        ;;
+                                        *)echo -e "\e[1;44m Invalid input, please try again \e[0m"
+                                        ;;
+                                esac
+                        ;;
+                        o)
+                        echo -e "\e[1;44m Please enter the number of the row you would like to delete : \e[0m"
+                        read rowNumber
+                        echo -e "\e[1;44m Are you sure? [y or n] Press x to return to the main menu: \e[0m"
+                        read reply
+                                case $reply in
+                                        y)
+                                        # using set to remove line using row number. Then confirming removal of records and showing full file.
+					sed -i "$rowNumber"d speciesDetails
+                                        echo -e "\e[1;44m Record removed \e[0m"
+					cat speciesDetails
+					break
+                                        ;;
+                                        n)
+                                        echo -e "\e[1;44m No problem \e[0m"
+                                        break
+                                        ;;
+                                        x)
+                                        exit
+                                        ;;
+                                        *)echo -e "\e[1;44m Invalid input, please enter y or n! \e[0m"
+                                        ;;
+                                esac
+                                ;;
+                        x)
+                        exit
+                        ;;
+                        *) echo -e "\e[1;44m Invalid input, please try again! \e[0m"
+			break
+                        ;;
+                esac
+        else
+		# else let user know that no records were found and allow them to search again or return to main menu.
+                echo -e "\e[1;44m Sorry, no records found! Press s to start again or x to return to the main menu : \e[0m"
+                read answer
+                        case $answer in
+                                s)
+                                break
+                                ;;
+                                x)
+                                exit
+                                ;;
+                                *) echo -e "\e[1;44m Invalid input! \e[0m"
+                                break
+                                ;;
+                        esac
+        fi
+        ;;
+		"Remove Duplicate Records")
+			echo
+			echo -e "\e[1;34m If there are any duplicates, they can be removed from the file. \e[0m"
+			# sorting file in dictionary order ignoring case piped to uniq command to print all duplicate lines.
+		 	echo
+			sort -f -d speciesDetails | uniq -D
+			echo
+			echo -e "\e[1;44m Would you like to remove all duplicate records? [y or n] or Choose x to return to the Main Menu \e[0m"
+			read response
+			case $response in
+				y)
+				# using awk to remove duplicate records and sending output to a new file. This file is then copied back to the original file and will no longer have duplicates.
+				awk '!seen[$0]++' speciesDetails > speciesDetailsNew
+				cp speciesDetailsNew speciesDetails
+				echo -e "\e[1;44m Duplicates Removed \n \e[0m"
+				cat speciesDetails
+				echo
+				break
+				;;
+				n)
+				echo -e "\e[1;44m No problem \e[0m"
+				echo
+				break
+				;;
+				x)
+				exit
+				;;
+				*)echo -e "\e[1;44m Invalid input, please enter y,n or x \e[0m"
+				;;
+			esac
+			;;
+		"Remove Blank Records")
+			# using sed to avoid the header, result piped to sed to find and remove blank lines and sending output to a new file. This file is then copied back to the original file which will not have blank records/lines.
+			sed -n '3,$p' speciesDetails | sed '/^$/d' speciesDetails > speciesDetails2
+			cp speciesDetails2 speciesDetails
+			echo -e "\e[1;44m Blank Records/Lines Removed \e[0m"
+			echo
+			cat speciesDetails
+			echo
+			sleep 5
+			break
+			;;
+		"Remove All Records")
+			# making sure the user actually wants to delete all records in the file.
+			echo -e "\e[1;44m Are you sure? This action cannot be undone! [y or n] \e[0m"
+                        read reply
+                        case $reply in
+                                y)
+				# overwriting speciesDetails file with this header. All records have been removed. User is returned to main menu.
+                                echo "Species Name | Species Location | Date of Recording | Recorders E-mail" > speciesDetails
+				exit
+                                ;;
+                                n)
+                                echo -e "\e[1;44m No problem \e[0m"
+                                break
+                                ;;
+                                *)
+                                echo -e "\e[1;44m Invalid input, please enter y or n! \e[0m"
+                                ;;
+                        esac
+			;;
+		"Return to Main Menu")
+			# returning user to main menu
+			exit
+			;;
+		# informing user of invalid input.
+		*) echo -e "\e[1;44m Invalid input. Please choose a valid number \e[0m";;
+        esac
+done
+done
